@@ -1,0 +1,6 @@
+---
+lodi r0 3 #111
+lodi r1 4 #222
+add  r2 r0 r1
+prt  r2
+ret  r2

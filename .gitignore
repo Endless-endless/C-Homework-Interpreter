@@ -1,0 +1,11 @@
+# 编译生成目录
+bin/
+obj/
+
+# 可执行文件和中间文件
+*.exe
+*.o
+
+# Code::Blocks 生成文件
+*.depend
+*.layout
