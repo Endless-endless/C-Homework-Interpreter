@@ -9,3 +9,6 @@ obj/
 # Code::Blocks 生成文件
 *.depend
 *.layout
+
+# Code::Blocks project files
+*.cbp
