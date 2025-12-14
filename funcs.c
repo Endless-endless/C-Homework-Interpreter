@@ -20,7 +20,7 @@ void file_destroy(struct file *f) {
 }
 
 
-/* È·±£ code ÖÁÉÙÄÜÈİÄÉ need ÌõÖ¸Áî */
+/* ç¡®ä¿ code è‡³å°‘èƒ½å®¹çº³ need æ¡æŒ‡ä»¤ */
 static int ensure_code_capacity(struct file *f, unsigned int need) {
     if (!f) return -1;
     if (need <= f->code_capacity) return 0;
@@ -41,13 +41,13 @@ static int ensure_code_capacity(struct file *f, unsigned int need) {
 }
 
 /*
-//ÏÖÔÚµÄÖ÷³ÌĞò¿ÉÒÔ´ò¿ªÊ¾ÀıÎÄ¼ş²¢ÇÒ½«ÆäÏÔÊ¾³öÀ´
+//ç°åœ¨çš„ä¸»ç¨‹åºå¯ä»¥æ‰“å¼€ç¤ºä¾‹æ–‡ä»¶å¹¶ä¸”å°†å…¶æ˜¾ç¤ºå‡ºæ¥
 int main(int argc, char**argv){
 	char path[100];
 	char filename[11]="\\test.jian";
 	get_dir(path,argv);
 	strcat(path,filename);
-	printf("ÎÄ¼şÎ»ÖÃ£º%s\n",path);
+	printf("æ–‡ä»¶ä½ç½®ï¼š%s\n",path);
 
 	printfile(read_file(path));
 
@@ -55,38 +55,38 @@ int main(int argc, char**argv){
 }
 */
 
-//read_fileº¯Êı£¬ÓÃÓÚ¶ÁÈ¡Ò»¸ö¶ş½øÖÆÎÄ¼ş¡£
-//pathÎªÎÄ¼şÂ·¾¶¡£
+//read_fileå‡½æ•°ï¼Œç”¨äºè¯»å–ä¸€ä¸ªäºŒè¿›åˆ¶æ–‡ä»¶ã€‚
+//pathä¸ºæ–‡ä»¶è·¯å¾„ã€‚
 struct file* read_file(char*path){
 	FILE*fp=fopen(path,"rb");
 	unsigned char code_lenth=0,memory_lenth=0;
 	if(!fp){
-		printf("Î´ÄÜÕÒµ½ÎÄ¼ş£º\n\t%s\n",path);
+		printf("æœªèƒ½æ‰¾åˆ°æ–‡ä»¶ï¼š\n\t%s\n",path);
 		return 0;
 	}
     struct file* file = file_create();
-    if (!file) { fclose(fp); printf("ÄÚ´æ²»×ã\n"); return NULL; }
+    if (!file) { fclose(fp); printf("å†…å­˜ä¸è¶³\n"); return NULL; }
 
     if (fread(&code_lenth, 1, 1, fp) != 1 ||
         fread(&memory_lenth, 1, 1, fp) != 1) {
-        printf("¶ş½øÖÆÎÄ¼ş·Ç·¨£ºÎÄ¼şÍ·²»×ã\n");
+        printf("äºŒè¿›åˆ¶æ–‡ä»¶éæ³•ï¼šæ–‡ä»¶å¤´ä¸è¶³\n");
         fclose(fp);
         file_destroy(file);
         return NULL;
     }
 
-    unsigned char *code = malloc(code_lenth);
+    unsigned char *code = (unsigned char*)calloc(code_lenth,1);
     if (fread(code, 1, code_lenth, fp) != code_lenth) {
-        printf("¶ş½øÖÆÎÄ¼ş·Ç·¨£º´úÂë¶Î³¤¶È²»×ã£¨¿ÉÄÜÎÄ¼ş±»½Ø¶Ï£©\n");
+        printf("äºŒè¿›åˆ¶æ–‡ä»¶éæ³•ï¼šä»£ç æ®µé•¿åº¦ä¸è¶³ï¼ˆå¯èƒ½æ–‡ä»¶è¢«æˆªæ–­ï¼‰\n");
         free(code);
         fclose(fp);
         file_destroy(file);
         return NULL;
     }
 
-    unsigned char *memory = malloc(memory_lenth);
+    unsigned char *memory = (unsigned char*)calloc(memory_lenth,1);
     if (fread(memory, 1, memory_lenth, fp) != memory_lenth) {
-        printf("¶ş½øÖÆÎÄ¼ş·Ç·¨£ºÊı¾İ¶Î³¤¶È²»×ã£¨¿ÉÄÜÎÄ¼ş±»½Ø¶Ï£©\n");
+        printf("äºŒè¿›åˆ¶æ–‡ä»¶éæ³•ï¼šæ•°æ®æ®µé•¿åº¦ä¸è¶³ï¼ˆå¯èƒ½æ–‡ä»¶è¢«æˆªæ–­ï¼‰\n");
         free(code);
         free(memory);
         fclose(fp);
@@ -95,7 +95,7 @@ struct file* read_file(char*path){
     }
 
     if (ensure_code_capacity(file, (unsigned int)code_lenth) != 0) {
-        printf("ÄÚ´æ²»×ã£ºÎŞ·¨Îª¶ş½øÖÆÖ¸Áî·ÖÅä¿Õ¼ä\n");
+        printf("å†…å­˜ä¸è¶³ï¼šæ— æ³•ä¸ºäºŒè¿›åˆ¶æŒ‡ä»¤åˆ†é…ç©ºé—´\n");
         fclose(fp);
         file_destroy(file);
         return NULL;
@@ -123,12 +123,12 @@ struct file* read_file(char*path){
 			file->code[i].op2=code[i]>>0&0b111;
 			file->code[i].op3=0;
 		}else if(code[i]<0b11010000){
-			file->code[i].cmd=LOD;//Ô­°æ¶à´òÁËÒ»¸öI£¬¸ÄÁË
+			file->code[i].cmd=LOD;//åŸç‰ˆå¤šæ‰“äº†ä¸€ä¸ªIï¼Œæ”¹äº†
 			file->code[i].op1=code[i]>>2&0b11;
 			file->code[i].op2=code[i]>>0&0b11;
 			file->code[i].op3=0;
 		}else if(code[i]<0b11100000){
-			file->code[i].cmd=STO;//Ô­°æ¶à´òÁËÒ»¸öI£¬¸ÄÁË
+			file->code[i].cmd=STO;//åŸç‰ˆå¤šæ‰“äº†ä¸€ä¸ªIï¼Œæ”¹äº†
 			file->code[i].op1=code[i]>>2&0b11;
 			file->code[i].op2=code[i]>>0&0b11;
 			file->code[i].op3=0;
@@ -158,21 +158,21 @@ struct file* read_file(char*path){
 			file->code[i].op2=0;
 			file->code[i].op3=0;
 		}
-		/*ËµÃ÷£º 0b´ú±í¶ş½øÖÆ£¬¶ø0´ú±í°Ë½øÖÆ£¬0x´ú±íÊ®Áù½øÖÆ¡£
- 		 *>>ºÍ&¶¼ÊÇÎ»ÔËËã¡£>>Ö¸ÓÒÒÆ£¬&ÊÇÎ»Óë¡£
-		 *Èç£º0b10101010ÓÒÒÆ¶¯3Î»Ôò¿ÉÒÔµÃµ½0b00010101¡£
-		 *Èç£º0b10101010ºÍ0b11110000°´Î»ÇóÓëÔò¿ÉÒÔµÃµ½0b10100000¡£
- 		 *Í¨¹ıÕâÁ½¸ö²Ù×÷£¬ÎÒÃÇ¿ÉÒÔÇáËÉÌáÈ¡³öÏëÒªµÄÈô¸ÉÎ»¡£
+		/*è¯´æ˜ï¼š 0bä»£è¡¨äºŒè¿›åˆ¶ï¼Œè€Œ0ä»£è¡¨å…«è¿›åˆ¶ï¼Œ0xä»£è¡¨åå…­è¿›åˆ¶ã€‚
+ 		 *>>å’Œ&éƒ½æ˜¯ä½è¿ç®—ã€‚>>æŒ‡å³ç§»ï¼Œ&æ˜¯ä½ä¸ã€‚
+		 *å¦‚ï¼š0b10101010å³ç§»åŠ¨3ä½åˆ™å¯ä»¥å¾—åˆ°0b00010101ã€‚
+		 *å¦‚ï¼š0b10101010å’Œ0b11110000æŒ‰ä½æ±‚ä¸åˆ™å¯ä»¥å¾—åˆ°0b10100000ã€‚
+ 		 *é€šè¿‡è¿™ä¸¤ä¸ªæ“ä½œï¼Œæˆ‘ä»¬å¯ä»¥è½»æ¾æå–å‡ºæƒ³è¦çš„è‹¥å¹²ä½ã€‚
  		 */
 	}
-	free(code);	//ÓÃÍêÄÚ´æ¼´Ê¹ÊÍ·ÅÊÇÒ»¸öºÃÏ°¹ß£¡
+	free(code);	//ç”¨å®Œå†…å­˜å³ä½¿é‡Šæ”¾æ˜¯ä¸€ä¸ªå¥½ä¹ æƒ¯ï¼
 
 	int m = memory_lenth;
     if (m > 256)  m = 256;
     for (int i = 0; i < m; i++)  file->memory[i] = memory[i];
     file->memory_lenth = (unsigned short)m;
 
-	free(memory);	//ÊÍ·ÅÄÚ´æ
+	free(memory);	//é‡Šæ”¾å†…å­˜
     fclose(fp);
 
 	file->code_lenth=(unsigned short int)code_lenth;
@@ -180,17 +180,17 @@ struct file* read_file(char*path){
 	return file;
 }
 
-//printfileº¯Êı£¬ÓÃÓÚ´òÓ¡Ò»¸öÒÑ¾­¶ÁÈ¡µÄ´úÂëÎÄ¼ş¡£
-//fileÖ¸ÏòÒ»¸öÒÑ¾­´úÂëÎÄ¼ş¡£
+//printfileå‡½æ•°ï¼Œç”¨äºæ‰“å°ä¸€ä¸ªå·²ç»è¯»å–çš„ä»£ç æ–‡ä»¶ã€‚
+//fileæŒ‡å‘ä¸€ä¸ªå·²ç»ä»£ç æ–‡ä»¶ã€‚
 void printfile(struct file*file){
 	char CMD[12][5] =
 	{
-		"",	//ÒòÎªÎÒÉè¶¨µÄÖ¸ÁîÀïadd±àºÅ´Ó1¿ªÊ¼£¬Òò´ËµÚ0Î»ÖÃ¿Õ
+		"",	//å› ä¸ºæˆ‘è®¾å®šçš„æŒ‡ä»¤é‡Œaddç¼–å·ä»1å¼€å§‹ï¼Œå› æ­¤ç¬¬0ä½ç½®ç©º
 		"add", "and", "not", "lodi", "stoi","lod",
 		"sto", "br", "jmp", "prt", "ret"
 	};
-	printf("ÎÄ¼şÄÚÈİ£º\n");
-	printf("-----------ÒÔÏÂÊÇ´úÂë-----------\n");
+	printf("æ–‡ä»¶å†…å®¹ï¼š\n");
+	printf("-----------ä»¥ä¸‹æ˜¯ä»£ç -----------\n");
 	for(int i=0;i<file->code_lenth;i++){
 		printf("%s\t",CMD[file->code[i].cmd]);
 		printf("r%d\t",file->code[i].op1);
@@ -204,24 +204,24 @@ void printfile(struct file*file){
 			printf("r%d",file->code[i].op3);
 		printf("\n");
 	}
-	printf("-----------ÒÔÏÂÊÇÄÚ´æ-----------\n");
+	printf("-----------ä»¥ä¸‹æ˜¯å†…å­˜-----------\n");
 	for(int i=0;i<file->memory_lenth;i++){
 		printf("%d\t",(signed char)file->memory[i]);
-		//ÎÒ±ØĞë½«Ëü×ª»¯³ÉÓĞ·ûºÅµÄ£¬·ñÔò´òÓ¡µÄ½á¹û¿ÉÄÜ»áºÜÆæ¹Ö£¨Äã¿ÉÒÔÊÔÊÔ¿´£©
+		//æˆ‘å¿…é¡»å°†å®ƒè½¬åŒ–æˆæœ‰ç¬¦å·çš„ï¼Œå¦åˆ™æ‰“å°çš„ç»“æœå¯èƒ½ä¼šå¾ˆå¥‡æ€ªï¼ˆä½ å¯ä»¥è¯•è¯•çœ‹ï¼‰
 		if(i%4==3) printf("\n");
 	}
 	printf("\n");
 }
 
-//runº¯Êı£¬ÓÃÓÚÔËĞĞÒ»¸öÒÑ¾­¶ÁÈ¡µÄ´úÂëÎÄ¼ş¡£
-//fileÖ¸ÏòÒ»¸öÒÑ¾­´úÂëÎÄ¼ş¡£
+//runå‡½æ•°ï¼Œç”¨äºè¿è¡Œä¸€ä¸ªå·²ç»è¯»å–çš„ä»£ç æ–‡ä»¶ã€‚
+//fileæŒ‡å‘ä¸€ä¸ªå·²ç»ä»£ç æ–‡ä»¶ã€‚
 /*
 int run(struct file*file){
-	char r[4]={0};	//¼´r0,r1,r2,r3
+	char r[4]={0};	//å³r0,r1,r2,r3
 	char memory[256];
 	signed char current = 0;
-	for(int i=0;i<256;i++) memory[i]=file->memory[i];	//½«ÄÚ´æ¿½±´Ò»·İ£¨·ÀÖ¹ÔËĞĞ¹ı³ÌËğ»µÔ­Êı¾İ£©
-	for(int ip=0;ip>=0&&ip<=255;ip++){	//ip±íÊ¾½ÓÏÂÀ´ĞèÒªÔËĞĞÄÄÒ»ĞĞ´úÂë
+	for(int i=0;i<256;i++) memory[i]=file->memory[i];	//å°†å†…å­˜æ‹·è´ä¸€ä»½ï¼ˆé˜²æ­¢è¿è¡Œè¿‡ç¨‹æŸååŸæ•°æ®ï¼‰
+	for(int ip=0;ip>=0&&ip<=255;ip++){	//ipè¡¨ç¤ºæ¥ä¸‹æ¥éœ€è¦è¿è¡Œå“ªä¸€è¡Œä»£ç 
 		switch(file->code[ip].cmd){
             case ADD:
                 r[file->code[ip].op1]=r[file->code[ip].op2]+r[file->code[ip].op3];
@@ -236,7 +236,7 @@ int run(struct file*file){
                 memory[7]=r[file->code[ip].op1];
                 break;
             case LOD:
-                current = (signed char)r[file->code[ip].op2]; // ÕıÈ·Óï·¨
+                current = (signed char)r[file->code[ip].op2]; // æ­£ç¡®è¯­æ³•
                 r[file->code[ip].op1] = memory[(signed char)current];
                 break;
             case STO:
@@ -249,36 +249,36 @@ int run(struct file*file){
 				break;
 			case JMP:
 				ip=(unsigned char)r[file->code[ip].op1]-1;
-				//ÒòÎªºóÃæ»¹»áÓĞip++£¬ËùÒÔÕâÀïĞèÒª-1¡£brÔò²»ĞèÒª£¨Ïê¼ûbrµÄËµÃ÷£©¡£
+				//å› ä¸ºåé¢è¿˜ä¼šæœ‰ip++ï¼Œæ‰€ä»¥è¿™é‡Œéœ€è¦-1ã€‚bråˆ™ä¸éœ€è¦ï¼ˆè¯¦è§brçš„è¯´æ˜ï¼‰ã€‚
 				break;
 			case PRT:
 				printf("%6d",r[file->code[ip].op1]);
 				break;
 			case RET:
 				return r[file->code[ip].op1];
-            case NOT:                                          //Ô­À´ÀÏÊ¦¸øµÄ³ÌĞòÀïÃæÃ»ÓĞĞ´£¬²¹ÉÏÁË
-                r[file->code[ip].op1] = ~r[file->code[ip].op1];  // °´Î»È¡·´
+            case NOT:                                          //åŸæ¥è€å¸ˆç»™çš„ç¨‹åºé‡Œé¢æ²¡æœ‰å†™ï¼Œè¡¥ä¸Šäº†
+                r[file->code[ip].op1] = ~r[file->code[ip].op1];  // æŒ‰ä½å–å
                 break;
 		}
 	}
-	printf("ÔËĞĞÊ±³öÏÖ´íÎó£ºipÖ¸ÕëÔ½½ç¡£\n");
+	printf("è¿è¡Œæ—¶å‡ºç°é”™è¯¯ï¼šipæŒ‡é’ˆè¶Šç•Œã€‚\n");
 	return -130;
 }
 
 */
 
-//ÕâÀïÎÒ¶Ôrunº¯Êı½øĞĞÁËÒ»Ğ©Ğ¡Ğ¡µÄĞŞ¸Ä£¬ÎªÁËÊ¹ÎÒµÄ³ÌĞòÉÏÏÂÁ÷³©ĞÔ¸üºÃ
+//è¿™é‡Œæˆ‘å¯¹runå‡½æ•°è¿›è¡Œäº†ä¸€äº›å°å°çš„ä¿®æ”¹ï¼Œä¸ºäº†ä½¿æˆ‘çš„ç¨‹åºä¸Šä¸‹æµç•…æ€§æ›´å¥½
 int run(struct file *file) {
     signed char r[4] = {0, 0, 0, 0};
     signed char memory[256] = {0};
     signed char current = 0;
 
-    // °ÑÎÄ¼şÀïµÄÄÚ´æ¿½±´Ò»·İ£¨Ã»ÓÃµ½µÄµØ·½±£³Ö 0£©
+    // æŠŠæ–‡ä»¶é‡Œçš„å†…å­˜æ‹·è´ä¸€ä»½ï¼ˆæ²¡ç”¨åˆ°çš„åœ°æ–¹ä¿æŒ 0ï¼‰
     for (int i = 0; i < file->memory_lenth && i < 256; i++) {
         memory[i] = (signed char)file->memory[i];
     }
 
-    // ip = Ö¸ÁîÖ¸Õë£¬´Ó 0 ¿ªÊ¼
+    // ip = æŒ‡ä»¤æŒ‡é’ˆï¼Œä» 0 å¼€å§‹
     for (int ip = 0; ip >= 0 && ip < (int)file->code_lenth; ip++) {
         ST ins = file->code[ip];
 
@@ -333,61 +333,61 @@ int run(struct file *file) {
         }
     }
 
-    printf("ÔËĞĞÊ±³öÏÖ´íÎó£ºipÖ¸ÕëÔ½½ç¡£\n");
+    printf("è¿è¡Œæ—¶å‡ºç°é”™è¯¯ï¼šipæŒ‡é’ˆè¶Šç•Œã€‚\n");
     return -130;
 }
 
 
 
-//ÎÊÌâ3.ÊµÏÖ½«´úÂë´ÓÎÄ±¾ÎÄ¼ş¶ÁÈ¡
-//ÎÒ¶¨ÒåµÄÎÄ±¾¸ñÊ½¾ÍÊÇ·ÖÎªÈı²¿·Ö£ºµÚÒ»²¿·Ö¡ª¡ª×¼±¸Çø
-//                                                           µÚ¶ş²¿·Ö¡ª¡ª·Ö¸îÏß¡°---¡±
-//                                                           µÚÈı²¿·Ö¡ª¡ª´úÂëÇø
-//                                                           #±íÃ÷ÁËºóÃæÊÇ×¢ÊÍ
+//é—®é¢˜3.å®ç°å°†ä»£ç ä»æ–‡æœ¬æ–‡ä»¶è¯»å–
+//æˆ‘å®šä¹‰çš„æ–‡æœ¬æ ¼å¼å°±æ˜¯åˆ†ä¸ºä¸‰éƒ¨åˆ†ï¼šç¬¬ä¸€éƒ¨åˆ†â€”â€”å‡†å¤‡åŒº
+//                                                           ç¬¬äºŒéƒ¨åˆ†â€”â€”åˆ†å‰²çº¿â€œ---â€
+//                                                           ç¬¬ä¸‰éƒ¨åˆ†â€”â€”ä»£ç åŒº
+//                                                           #è¡¨æ˜äº†åé¢æ˜¯æ³¨é‡Š
 
-void trim(char *s) {               //È¥µôĞĞÎ²»»ĞĞµÄ»»ĞĞ·û£¬ÎªÁËÃ¿Ò»ĞĞÊ¹ÓÃstrcmpº¯ÊıÅĞ¶ÏÒÔ¼°·Ö¸îÏßµÄ¶ÁÈ¡
+void trim(char *s) {               //å»æ‰è¡Œå°¾æ¢è¡Œçš„æ¢è¡Œç¬¦ï¼Œä¸ºäº†æ¯ä¸€è¡Œä½¿ç”¨strcmpå‡½æ•°åˆ¤æ–­ä»¥åŠåˆ†å‰²çº¿çš„è¯»å–
     int len=(int)strlen(s);
     while (len>0 && s[len-1]=='\n') {
         s[--len]= '\0';
     }
 }
 
-int parse_reg(const char *tok) {             //°Ñr0¡¢r1×ª»¯³ÉÊı×Ö
+int parse_reg(const char *tok) {             //æŠŠr0ã€r1è½¬åŒ–æˆæ•°å­—
     if ((tok[0] == 'r' || tok[0] == 'R') && tok[1] >= '0' && tok[1] <= '9') {
         return tok[1] - '0';
     }
     return atoi(tok);
 }
 
-int parse_reg_checked(const char *tok,int* output){        //ÕâÀïÍê³ÉÁËÍØÕ¹2£¬Í¨¹ı¼ìÑé¶ş½øÖÆÏÂÊÇ·ñÔÚ0~3Ö®¼ä¼ìÑéÊÇ·ñºÏ·¨
+int parse_reg_checked(const char *tok,int* output){        //è¿™é‡Œå®Œæˆäº†æ‹“å±•2ï¼Œé€šè¿‡æ£€éªŒäºŒè¿›åˆ¶ä¸‹æ˜¯å¦åœ¨0~3ä¹‹é—´æ£€éªŒæ˜¯å¦åˆæ³•
     int r=parse_reg(tok);
     if (r<0 || r>3) return -1;
     *output=r;
     return 0;
 }
 
-int parse_code_line(const char *line, ST *out) {            //Ö÷º¯Êı
+int parse_code_line(const char *line, ST *out) {            //ä¸»å‡½æ•°
     char buf[128];
     strcpy(buf, line);
 
-    char *p=strchr(buf,'#');            //ÕâÀïÍê³ÉÁËÍØÕ¹1£¬½áÎ²Îª#±íÃ÷ÁËºóÃæÊÇ×¢ÊÍ
+    char *p=strchr(buf,'#');            //è¿™é‡Œå®Œæˆäº†æ‹“å±•1ï¼Œç»“å°¾ä¸º#è¡¨æ˜äº†åé¢æ˜¯æ³¨é‡Š
     if (p) *p = '\0';
 
     trim(buf);
 
     if (buf[0] == '\0') {
-        return 0;   // Ô¼¶¨£º0 ±íÊ¾ÕâĞĞÊÇ¿Õ
+        return 0;   // çº¦å®šï¼š0 è¡¨ç¤ºè¿™è¡Œæ˜¯ç©º
     }
 
     char op[16], a[16], b[16], c[16];
     op[0] = a[0] = b[0] = c[0] = '\0';
 
-    int n = sscanf(buf, "%10s %10s %10s %10s", op, a, b, c);      // °ÑÒ»ĞĞ²ğ³É£ºÖ¸ÁîÃû + 3 ¸ö²ÎÊı
+    int n = sscanf(buf, "%10s %10s %10s %10s", op, a, b, c);      // æŠŠä¸€è¡Œæ‹†æˆï¼šæŒ‡ä»¤å + 3 ä¸ªå‚æ•°
 
     if (strcmp(op, "add") == 0) {
         int r1,r2,r3;
         if (parse_reg_checked(a, &r1) < 0 || parse_reg_checked(b, &r2) < 0 || parse_reg_checked(c, &r3) < 0) {
-            printf("¼Ä´æÆ÷±àºÅ·Ç·¨£º%s\n", line);
+            printf("å¯„å­˜å™¨ç¼–å·éæ³•ï¼š%s\n", line);
             return -1;
         }
         out->cmd = ADD;
@@ -397,7 +397,7 @@ int parse_code_line(const char *line, ST *out) {            //Ö÷º¯Êı
     } else if (strcmp(op, "and") == 0) {
         int r1,r2,r3;
         if (parse_reg_checked(a, &r1) < 0 || parse_reg_checked(b, &r2) < 0 || parse_reg_checked(c, &r3) < 0) {
-            printf("¼Ä´æÆ÷±àºÅ·Ç·¨£º%s\n", line);
+            printf("å¯„å­˜å™¨ç¼–å·éæ³•ï¼š%s\n", line);
             return -1;
         }
         out->cmd = AND;
@@ -407,7 +407,7 @@ int parse_code_line(const char *line, ST *out) {            //Ö÷º¯Êı
     } else if (strcmp(op, "not") == 0) {
         int r1;
         if (parse_reg_checked(a, &r1) < 0) {
-            printf("¼Ä´æÆ÷±àºÅ·Ç·¨£º%s\n", line);
+            printf("å¯„å­˜å™¨ç¼–å·éæ³•ï¼š%s\n", line);
             return -1;
         }
         out->cmd = NOT;
@@ -417,12 +417,12 @@ int parse_code_line(const char *line, ST *out) {            //Ö÷º¯Êı
     } else if (strcmp(op, "lodi") == 0) {
         int r1;
         if (parse_reg_checked(a, &r1) < 0) {
-            printf("¼Ä´æÆ÷±àºÅ·Ç·¨£º%s\n", line);
+            printf("å¯„å­˜å™¨ç¼–å·éæ³•ï¼š%s\n", line);
             return -1;
         }
         int n = atoi(b);
         if (n < 0 || n > 7) {
-            printf("lodi Ö¸ÁîÖĞÁ¢¼´Êı³¬³ö·¶Î§(0~7)£º%s\n", line);
+            printf("lodi æŒ‡ä»¤ä¸­ç«‹å³æ•°è¶…å‡ºèŒƒå›´(0~7)ï¼š%s\n", line);
             return -1;
         }
         out->cmd = LODI;
@@ -432,12 +432,12 @@ int parse_code_line(const char *line, ST *out) {            //Ö÷º¯Êı
     } else if (strcmp(op, "stoi") == 0) {
         int r1;
         if (parse_reg_checked(a, &r1) < 0) {
-            printf("¼Ä´æÆ÷±àºÅ·Ç·¨£º%s\n", line);
+            printf("å¯„å­˜å™¨ç¼–å·éæ³•ï¼š%s\n", line);
             return -1;
         }
         int n = atoi(b);
         if (n < 0 || n > 7) {
-            printf("stoi Ö¸ÁîÖĞÁ¢¼´Êı³¬³ö·¶Î§(0~7)£º%s\n", line);
+            printf("stoi æŒ‡ä»¤ä¸­ç«‹å³æ•°è¶…å‡ºèŒƒå›´(0~7)ï¼š%s\n", line);
             return -1;
         }
         out->cmd = STOI;
@@ -447,7 +447,7 @@ int parse_code_line(const char *line, ST *out) {            //Ö÷º¯Êı
     } else if (strcmp(op, "lod") == 0) {
         int r1,r2;
         if (parse_reg_checked(a, &r1) < 0 || parse_reg_checked(b, &r2) < 0) {
-            printf("¼Ä´æÆ÷±àºÅ·Ç·¨£º%s\n", line);
+            printf("å¯„å­˜å™¨ç¼–å·éæ³•ï¼š%s\n", line);
             return -1;
         }
         out->cmd = LOD;
@@ -457,7 +457,7 @@ int parse_code_line(const char *line, ST *out) {            //Ö÷º¯Êı
     } else if (strcmp(op, "sto") == 0) {
         int r1,r2;
         if (parse_reg_checked(a, &r1) < 0 || parse_reg_checked(b, &r2) < 0) {
-            printf("¼Ä´æÆ÷±àºÅ·Ç·¨£º%s\n", line);
+            printf("å¯„å­˜å™¨ç¼–å·éæ³•ï¼š%s\n", line);
             return -1;
         }
         out->cmd = STO;
@@ -467,7 +467,7 @@ int parse_code_line(const char *line, ST *out) {            //Ö÷º¯Êı
     } else if (strcmp(op, "br") == 0) {
         int r1,r2;
         if (parse_reg_checked(a, &r1) < 0 || parse_reg_checked(b, &r2) < 0) {
-            printf("¼Ä´æÆ÷±àºÅ·Ç·¨£º%s\n", line);
+            printf("å¯„å­˜å™¨ç¼–å·éæ³•ï¼š%s\n", line);
             return -1;
         }
         out->cmd = BR;
@@ -477,7 +477,7 @@ int parse_code_line(const char *line, ST *out) {            //Ö÷º¯Êı
     } else if (strcmp(op, "jmp") == 0) {
         int r1;
         if (parse_reg_checked(a, &r1) < 0) {
-            printf("¼Ä´æÆ÷±àºÅ·Ç·¨£º%s\n", line);
+            printf("å¯„å­˜å™¨ç¼–å·éæ³•ï¼š%s\n", line);
             return -1;
         }
         out->cmd = JMP;
@@ -487,7 +487,7 @@ int parse_code_line(const char *line, ST *out) {            //Ö÷º¯Êı
     } else if (strcmp(op, "prt") == 0) {
         int r1;
         if (parse_reg_checked(a, &r1) < 0) {
-            printf("¼Ä´æÆ÷±àºÅ·Ç·¨£º%s\n", line);
+            printf("å¯„å­˜å™¨ç¼–å·éæ³•ï¼š%s\n", line);
             return -1;
         }
         out->cmd = PRT;
@@ -497,10 +497,10 @@ int parse_code_line(const char *line, ST *out) {            //Ö÷º¯Êı
     } else if (strcmp(op, "ret") == 0) {
         int r1;
 
-        if (n >= 2) {               //Èç¹ûËµÊäÈëµÄ²ÎÊı¸öÊı>=2£¬Ö±½Ó¶Áop1£¬·ñÔòÄ¬ÈÏr3
+        if (n >= 2) {               //å¦‚æœè¯´è¾“å…¥çš„å‚æ•°ä¸ªæ•°>=2ï¼Œç›´æ¥è¯»op1ï¼Œå¦åˆ™é»˜è®¤r3
             if (parse_reg_checked(a, &r1) < 0) {
-                printf("ret Ö¸ÁîÖĞ¼Ä´æÆ÷·Ç·¨£º%s\n", line);
-                return -1;        // ĞĞ½âÎöÊ§°Ü
+                printf("ret æŒ‡ä»¤ä¸­å¯„å­˜å™¨éæ³•ï¼š%s\n", line);
+                return -1;        // è¡Œè§£æå¤±è´¥
             }
         } else {
             r1 = 3;
@@ -516,23 +516,23 @@ int parse_code_line(const char *line, ST *out) {            //Ö÷º¯Êı
     return 1;
 }
 
-int read_code(const char *path, struct file *file) {          //¶ÔÎÄ±¾½øĞĞ²Ù×÷
+int read_code(const char *path, struct file *file) {          //å¯¹æ–‡æœ¬è¿›è¡Œæ“ä½œ
     FILE *fp = fopen(path, "r");
     if (!fp) {
-        printf("ÎŞ·¨´ò¿ªÔ´ÎÄ¼ş£º%s\n", path);
+        printf("æ— æ³•æ‰“å¼€æºæ–‡ä»¶ï¼š%s\n", path);
         return -1;
     }
 
-    // Çå¿Õ¾ÉÄÚÈİ
+    // æ¸…ç©ºæ—§å†…å®¹
     file->code_lenth = 0;
     file->memory_lenth = 0;
 
     char line[256];
-    int in_code_section = 0;  // 0 = ×¼±¸Çø£¬1 = ´úÂëÇø
-    int ok=1;                  //ÅĞ¶ÏÕûÌåÊÇ·ñºÏ·¨
+    int in_code_section = 0;  // 0 = å‡†å¤‡åŒºï¼Œ1 = ä»£ç åŒº
+    int ok=1;                  //åˆ¤æ–­æ•´ä½“æ˜¯å¦åˆæ³•
 
-    while (fgets(line, sizeof(line), fp)) {           //¶ÔÃ¿Ò»ĞĞ½øĞĞ¶ÁÈ¡£¬Ö»Òª²»ÊÇ¿ÕĞĞ
-        if (strncmp(line, "---", 3) == 0) {           // Óöµ½ --- ËµÃ÷½øÈë´úÂëÇø
+    while (fgets(line, sizeof(line), fp)) {           //å¯¹æ¯ä¸€è¡Œè¿›è¡Œè¯»å–ï¼Œåªè¦ä¸æ˜¯ç©ºè¡Œ
+        if (strncmp(line, "---", 3) == 0) {           // é‡åˆ° --- è¯´æ˜è¿›å…¥ä»£ç åŒº
             in_code_section = 1;
             continue;
         }
@@ -541,23 +541,23 @@ int read_code(const char *path, struct file *file) {          //¶ÔÎÄ±¾½øĞĞ²Ù×÷
         }
 
         ST ins;
-        int r=parse_code_line(line, &ins);        //°ÑÎÄ±¾ÀïµÄÕâÒ»ĞĞÖ¸Áî½âÎöÎª»úÆ÷ÓïÑÔ
+        int r=parse_code_line(line, &ins);        //æŠŠæ–‡æœ¬é‡Œçš„è¿™ä¸€è¡ŒæŒ‡ä»¤è§£æä¸ºæœºå™¨è¯­è¨€
         if (r==1) {
             if (ensure_code_capacity(file, (unsigned int)file->code_lenth + 1) != 0) {
-                printf("ÄÚ´æ²»×ã£ºÎŞ·¨¼ÌĞøÀ©ÈİÖ¸ÁîÊı×é\n");
+                printf("å†…å­˜ä¸è¶³ï¼šæ— æ³•ç»§ç»­æ‰©å®¹æŒ‡ä»¤æ•°ç»„\n");
                 ok=0;
                 break;
             }
             file->code[file->code_lenth++] = ins;
         } else if (r == -1) {
-            printf("ÎŞ·¨Ê¶±ğµÄÖ¸ÁîĞĞ£º%s", line);
+            printf("æ— æ³•è¯†åˆ«çš„æŒ‡ä»¤è¡Œï¼š%s", line);
             ok=0;
         }
     }
     fclose(fp);
 
     if (!in_code_section || file->code_lenth == 0) {
-        printf("Ã»ÓĞÕÒµ½ '---' »òÃ»ÓĞÈÎºÎÖ¸Áî£¬³ÌĞò²»ºÏ·¨\n");
+        printf("æ²¡æœ‰æ‰¾åˆ° '---' æˆ–æ²¡æœ‰ä»»ä½•æŒ‡ä»¤ï¼Œç¨‹åºä¸åˆæ³•\n");
         ok = 0;
     }
 
@@ -567,7 +567,7 @@ int read_code(const char *path, struct file *file) {          //¶ÔÎÄ±¾½øĞĞ²Ù×÷
 
 
 
-//ÎÊÌâ4
+//é—®é¢˜4
 
 typedef unsigned char uint8;
 
@@ -656,14 +656,14 @@ uint8 encode_ret(short op1) {
     return code;
 }
 
-int save(struct file*file,const char* filename){    //Ö÷º¯Êı
+int save(struct file*file,const char* filename){    //ä¸»å‡½æ•°
     if (file==NULL || filename==NULL){
-        printf("´íÎó\n");
+        printf("é”™è¯¯\n");
         return -1;
     }
 
     if (file->code_lenth > 255) {
-        printf("saveÊ§°Ü£ºÔ­.jian¸ñÊ½½öÖ§³Ö<=255ÌõÖ¸Áî£¨µ±Ç°=%u£©\n", (unsigned)file->code_lenth);
+        printf("saveå¤±è´¥ï¼šåŸ.jianæ ¼å¼ä»…æ”¯æŒ<=255æ¡æŒ‡ä»¤ï¼ˆå½“å‰=%uï¼‰\n", (unsigned)file->code_lenth);
         return -1;
     }
 
@@ -708,7 +708,7 @@ int save(struct file*file,const char* filename){    //Ö÷º¯Êı
                 code_bytes[code_cnt++] = encode_ret(ins->op1);
                 break;
             default:
-                printf("µÚ %d ÌõÖ¸Áî cmd=%d ÓĞÎó\n", i , ins->cmd);
+                printf("ç¬¬ %d æ¡æŒ‡ä»¤ cmd=%d æœ‰è¯¯\n", i , ins->cmd);
                 break;
         }
     }
@@ -718,18 +718,18 @@ int save(struct file*file,const char* filename){    //Ö÷º¯Êı
 
     FILE *fp=fopen(filename,"wb");
     if(!fp){
-        printf("ÎŞ·¨´´½¨ÎÄ±¾\n");
+        printf("æ— æ³•åˆ›å»ºæ–‡æœ¬\n");
         return -1;
     }
 
-    // 1. Ğ´Í·Á½¸ö×Ö½Ú
+    // 1. å†™å¤´ä¸¤ä¸ªå­—èŠ‚
     fwrite(&code_len, 1, 1, fp);
     fwrite(&data_len, 1, 1, fp);
 
-    // 2. Ğ´´úÂë¶Î
+    // 2. å†™ä»£ç æ®µ
     fwrite(code_bytes, 1, code_len, fp);
 
-    // 3. Ğ´Êı¾İ¶Î
+    // 3. å†™æ•°æ®æ®µ
     fwrite(file->memory, 1, data_len, fp);
 
     fclose(fp);
@@ -738,11 +738,11 @@ int save(struct file*file,const char* filename){    //Ö÷º¯Êı
 
 
 /*
- *	ÄãµÄÈÎÎñ£º
- *	1.½«¶ş½øÖÆ´úÂë¶ÁÈ¡µÄÈÎÎñÒÑ¾­Íê³ÉÁË£¬Çë×ÔĞĞÔÄ¶Á²¢³¢ÊÔÀí½â¡££¨ÈçÓĞ±ØÒª£¬Äã¿ÉÒÔ×ÔĞĞĞŞ¸Ä£©Íê³É
- *	2.ÀûÓÃCÓïÑÔÄ£Äâ´úÂëµÄÔËĞĞ¡££¨ÒÑ¾­Íê³ÉÁËÒ»°ë£¬Çë²¹È«´úÂë£©                                                    Íê³É
- *	3.ÊµÏÖ½«´úÂë´ÓÎÄ±¾ÎÄ¼ş¶ÁÈ¡£¨Äã¿ÉÒÔ×Ô¼ºÖÆ¶¨Ò»Ìõ¹æÔò´æ·Å³ÌĞòËùĞèÒªÓÃµÄ²ÎÊı£©¡£                  Íê³É
- *	4.ÊµÏÖ½«´úÂë±£´æÎª¶ş½øÖÆÎÄ¼ş¡£                                                                                                      Íê³É
- *	5.´´½¨Ò»¸ö²Ëµ¥£¬Ê¹µÃÉÏÊö¹¦ÄÜ¿ÉÒÔ·½±ãµØÊµÏÖ²¢Íê³É¡£
+ *	ä½ çš„ä»»åŠ¡ï¼š
+ *	1.å°†äºŒè¿›åˆ¶ä»£ç è¯»å–çš„ä»»åŠ¡å·²ç»å®Œæˆäº†ï¼Œè¯·è‡ªè¡Œé˜…è¯»å¹¶å°è¯•ç†è§£ã€‚ï¼ˆå¦‚æœ‰å¿…è¦ï¼Œä½ å¯ä»¥è‡ªè¡Œä¿®æ”¹ï¼‰å®Œæˆ
+ *	2.åˆ©ç”¨Cè¯­è¨€æ¨¡æ‹Ÿä»£ç çš„è¿è¡Œã€‚ï¼ˆå·²ç»å®Œæˆäº†ä¸€åŠï¼Œè¯·è¡¥å…¨ä»£ç ï¼‰                                                    å®Œæˆ
+ *	3.å®ç°å°†ä»£ç ä»æ–‡æœ¬æ–‡ä»¶è¯»å–ï¼ˆä½ å¯ä»¥è‡ªå·±åˆ¶å®šä¸€æ¡è§„åˆ™å­˜æ”¾ç¨‹åºæ‰€éœ€è¦ç”¨çš„å‚æ•°ï¼‰ã€‚                  å®Œæˆ
+ *	4.å®ç°å°†ä»£ç ä¿å­˜ä¸ºäºŒè¿›åˆ¶æ–‡ä»¶ã€‚                                                                                                      å®Œæˆ
+ *	5.åˆ›å»ºä¸€ä¸ªèœå•ï¼Œä½¿å¾—ä¸Šè¿°åŠŸèƒ½å¯ä»¥æ–¹ä¾¿åœ°å®ç°å¹¶å®Œæˆã€‚
  */
 
