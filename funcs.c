@@ -16,7 +16,9 @@ struct file *file_create(void) {
 void file_destroy(struct file *f) {
     if (!f) return;
     free(f->code);
-    free(f);
+    f->code = NULL;
+    f->code_capacity = 0;
+    f->code_lenth = 0;
 }
 
 
